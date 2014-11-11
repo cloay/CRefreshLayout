@@ -11,6 +11,10 @@ import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 
 /**
@@ -27,7 +31,7 @@ public class CRefreshView extends RelativeLayout{
     private static final float kloadingTimingOffset = 0.1f;
     private static final float kdisappearDuration = 1.2f;
     
-    private int dropHeight = 100;
+    private int dropHeight = 80;
     private int lineColor = Color.BLACK;
     private float lineWidth = 8f;
     private float disappearProgress;
@@ -58,16 +62,16 @@ public class CRefreshView extends RelativeLayout{
 		barItems = new ArrayList<BarItem>();
 		
 		List<Point> startPoints = new ArrayList<Point>();
-		startPoints.add(new Point(100, -50));
-		startPoints.add(new Point(200, -50));
-		startPoints.add(new Point(100, -50));
-		startPoints.add(new Point(100, 50));
+		startPoints.add(new Point(100, 0));
+		startPoints.add(new Point(200, 0));
+		startPoints.add(new Point(100, 0));
+		startPoints.add(new Point(100, 0));
 		
 		List<Point> endPoints = new ArrayList<Point>();
-		endPoints.add(new Point(200, -50));
-		endPoints.add(new Point(200, 50));
-		endPoints.add(new Point(100, 50));
-		endPoints.add(new Point(200, 50));
+		endPoints.add(new Point(200, 0));
+		endPoints.add(new Point(200, 100));
+		endPoints.add(new Point(100, 100));
+		endPoints.add(new Point(200, 100));
 		
 		int width = 0;
 		int height = 0;
@@ -119,15 +123,27 @@ public class CRefreshView extends RelativeLayout{
 	            else
 	                realProgress = Math.min(1, (progress - startPadding)/this.internalAnimationFactor);
 	            
-	            AnimatorSet mAnimatorSet = new AnimatorSet();
-	    		mAnimatorSet.setDuration(800);
-	    		mAnimatorSet.playTogether(
-	    					ObjectAnimator.ofFloat(barItem, "translationY", -barItem.translationX*(1-realProgress), this.dropHeight*(1-realProgress)),
-//	    					ObjectAnimator.ofFloat(barItem, "rotation", 0, 10, 0, 10),
-	    					ObjectAnimator.ofFloat(barItem, "scaleX", realProgress, realProgress),
-	    					ObjectAnimator.ofFloat(barItem, "scaleY", realProgress, realProgress)
-	    				);
-	    		mAnimatorSet.start();
+//	            AnimatorSet mAnimatorSet = new AnimatorSet();
+//	    		mAnimatorSet.setDuration(800);
+//	    		
+//	    		mAnimatorSet.playTogether(
+//	    					ObjectAnimator.ofFloat(barItem, "translationY", -barItem.translationX*(1-realProgress), this.dropHeight*(1-realProgress)),
+////	    					ObjectAnimator.ofFloat(barItem, "rotation", 0, 10, 0, 10),
+//	    					ObjectAnimator.ofFloat(barItem, "scaleX", realProgress, realProgress),
+//	    					ObjectAnimator.ofFloat(barItem, "scaleY", realProgress, realProgress)
+//	    				);
+//	    		mAnimatorSet.start();
+	            AnimationSet anim = new AnimationSet(true); 
+	            Animation tAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 1.0f,
+	            		Animation.ABSOLUTE, -barItem.translationX*(1-realProgress), Animation.ABSOLUTE, this.dropHeight*(1-realProgress));
+	    		Animation rAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 
+	    				0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+	    		Animation sAnimation = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f,   
+	    				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+	    		anim.addAnimation(tAnimation);
+	    		anim.addAnimation(rAnimation);
+	    		anim.addAnimation(sAnimation);
+	    		barItem.startAnimation(anim);
 	            barItem.setAlpha(realProgress * kbarDarkAlpha);
 	        }
 	    }
