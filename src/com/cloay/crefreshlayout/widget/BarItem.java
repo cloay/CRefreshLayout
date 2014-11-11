@@ -2,6 +2,7 @@ package com.cloay.crefreshlayout.widget;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -29,7 +31,7 @@ public class BarItem extends View {
 	private float lineWidth;
 	private int lineColor;
 	
-	private float translationX;
+	public float translationX;
 	public BarItem(Context context) {
 		super(context);
 	}
@@ -56,25 +58,29 @@ public class BarItem extends View {
 	}
 
 	public void setupFrame(){
-		this.layout((int)this.getX() + this.middlePoint.x - this.getWidth()/2, 
-				(int)this.getY() + this.middlePoint.y + this.getHeight()/2, 
-				this.getWidth(), this.getHeight());
+		this.layout(this.startPoint.x  + this.middlePoint.x - this.getWidth()/2, 
+				this.startPoint.y + this.middlePoint.y - this.getHeight()/2, 
+				this.getWidth() + this.startPoint.x + this.middlePoint.x - this.getWidth()/2, 
+				this.getHeight() + this.startPoint.y + this.middlePoint.y - this.getHeight()/2);
+		Log.v("CRefresh", "X=" + this.getX() + " Y=" + this.getY() + 
+				" width=" + this.getWidth() + " height=" + this.getHeight());
 	}
 	
 	public void setHorizontalRandomness(int horizontalRandomness, int dropHeight){
 		int randomNum = -horizontalRandomness + (int)(Math.random()*horizontalRandomness*2) + 1;
 		this.translationX = randomNum;
 		AnimatorSet mAnimatorSet = new AnimatorSet();
-		mAnimatorSet.setDuration(500);
+		mAnimatorSet.setDuration(800);
 		mAnimatorSet.playTogether(
-					ObjectAnimator.ofFloat(this, "translationX", this.translationX, -dropHeight)
+					ObjectAnimator.ofFloat(this, "translationY", this.translationX, -dropHeight)
 				);
 		mAnimatorSet.start();
 	}
-	
+
+	@SuppressLint("DrawAllocation")
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
 		Paint paint = new Paint();  
 	    paint.setAntiAlias(true);
 	    paint.setColor(lineColor);  
@@ -82,11 +88,11 @@ public class BarItem extends View {
 	    paint.setStrokeCap(Cap.ROUND);
 	    paint.setStrokeJoin(Join.ROUND);
 	    paint.setStyle(Style.STROKE);
-	    Canvas canvas = new Canvas();
 	    Path path = new Path();
 	    path.moveTo(startPoint.x, startPoint.y);
 	    path.lineTo(endPoint.x, endPoint.y);
 	    canvas.drawPath(path, paint);
 	}
+	
 	
 }
