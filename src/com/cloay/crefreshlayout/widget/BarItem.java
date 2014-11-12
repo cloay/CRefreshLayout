@@ -1,10 +1,9 @@
 package com.cloay.crefreshlayout.widget;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -12,8 +11,9 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 /**
  * 
@@ -32,6 +32,9 @@ public class BarItem extends View {
 	private int lineColor;
 	
 	public float translationX;
+	
+	private Matrix mMatrix;
+	
 	public BarItem(Context context) {
 		super(context);
 	}
@@ -55,6 +58,7 @@ public class BarItem extends View {
 		
 		this.lineColor = lineColor;
 		this.lineWidth = lineWidth;
+		mMatrix = new Matrix();
 	}
 
 	public void setupFrame(){
@@ -62,19 +66,16 @@ public class BarItem extends View {
 				this.startPoint.y + this.middlePoint.y - this.getHeight()/2, 
 				this.getWidth() + this.startPoint.x + this.middlePoint.x - this.getWidth()/2, 
 				this.getHeight() + this.startPoint.y + this.middlePoint.y - this.getHeight()/2);
-		Log.v("CRefresh", "X=" + this.getX() + " Y=" + this.getY() + 
-				" width=" + this.getWidth() + " height=" + this.getHeight());
 	}
 	
 	public void setHorizontalRandomness(int horizontalRandomness, int dropHeight){
-		int randomNum = -horizontalRandomness + (int)(Math.random()*horizontalRandomness*2) + 1;
+		int randomNum = -horizontalRandomness + (int)(Math.random()*horizontalRandomness*2);
 		this.translationX = randomNum;
-		AnimatorSet mAnimatorSet = new AnimatorSet();
-		mAnimatorSet.setDuration(800);
-		mAnimatorSet.playTogether(
-					ObjectAnimator.ofFloat(this, "translationY", this.translationX, -dropHeight)
-				);
-		mAnimatorSet.start();
+		
+		Animation tAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 1.0f,
+				Animation.RELATIVE_TO_PARENT, this.translationX, Animation.RELATIVE_TO_PARENT, -dropHeight);
+		tAnimation.setDuration(600);
+		this.startAnimation(tAnimation);
 	}
 
 	@SuppressLint("DrawAllocation")
@@ -91,8 +92,24 @@ public class BarItem extends View {
 	    Path path = new Path();
 	    path.moveTo(startPoint.x, startPoint.y);
 	    path.lineTo(endPoint.x, endPoint.y);
+	    canvas.setMatrix(mMatrix);
 	    canvas.drawPath(path, paint);
 	}
 	
-	
+	public void preMatrixScale(float scaleX, float scaleY) {
+        mMatrix.preScale(scaleX, scaleY, middlePoint.x, middlePoint.y);
+    }
+    
+    public void preMatrixTranslate(float translateX, float translateY) {
+        mMatrix.preTranslate(translateX, translateY);
+    }
+    
+    public void preMatrixRotate(float degree) {
+        mMatrix.preRotate(degree, startPoint.x, startPoint.y);
+    }
+    
+    public void resetMatrix(){
+    	mMatrix.reset();
+    	invalidate();
+    }
 }

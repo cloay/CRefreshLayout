@@ -3,18 +3,14 @@ package com.cloay.crefreshlayout.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.RotateAnimation;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 
 /**
@@ -26,14 +22,14 @@ import android.widget.RelativeLayout;
  */
 public class CRefreshView extends RelativeLayout{
 	
-    private static final float kloadingIndividualAnimationTiming = 0.8f;
-    private static final float kbarDarkAlpha = 0.4f;
-    private static final float kloadingTimingOffset = 0.1f;
-    private static final float kdisappearDuration = 1.2f;
+    private static final long kloadingIndividualAnimationTiming = 800;
+    private static final float kbarDarkAlpha = 0.6f;
+    private static final long kloadingTimingOffset = 250;
+    private static final float kdisappearDuration = 0.8f;
     
-    private int dropHeight = 80;
+    private int dropHeight = 180;
     private int lineColor = Color.BLACK;
-    private float lineWidth = 8f;
+    private float lineWidth = 6f;
     private float disappearProgress;
     private boolean reverseLoadingAnimation = true;
     private float internalAnimationFactor = 0.5f;
@@ -62,30 +58,18 @@ public class CRefreshView extends RelativeLayout{
 		barItems = new ArrayList<BarItem>();
 		
 		List<Point> startPoints = new ArrayList<Point>();
-		startPoints.add(new Point(100, 0));
-		startPoints.add(new Point(200, 0));
-		startPoints.add(new Point(100, 0));
-		startPoints.add(new Point(100, 0));
+		startPoints.add(new Point(335, 50));
+		startPoints.add(new Point(385, 50));
+		startPoints.add(new Point(335, 50));
+		startPoints.add(new Point(335, 100));
 		
 		List<Point> endPoints = new ArrayList<Point>();
-		endPoints.add(new Point(200, 0));
-		endPoints.add(new Point(200, 100));
-		endPoints.add(new Point(100, 100));
-		endPoints.add(new Point(200, 100));
+		endPoints.add(new Point(385, 50));
+		endPoints.add(new Point(385, 100));
+		endPoints.add(new Point(335, 100));
+		endPoints.add(new Point(385, 100));
 		
-		int width = 0;
-		int height = 0;
-		for(int i = 0; i < startPoints.size(); i++){
-			Point startPoint = startPoints.get(i);
-			Point endPoint = endPoints.get(i);
-	        
-	        if (startPoint.x > width) width = startPoint.x;
-	        if (endPoint.x > width) width = endPoint.x;
-	        if (startPoint.y > height) height = startPoint.y;
-	        if (endPoint.y > height) height = endPoint.y;
-		}
 		
-		this.layout(0, 0, width, height);
 		
 		for(int i = 0; i < startPoints.size(); i++){
 			Point startP = startPoints.get(i);
@@ -102,7 +86,6 @@ public class CRefreshView extends RelativeLayout{
 		for (BarItem barItem : this.barItems) {
 			barItem.setupFrame();
 	    }
-		
 	}
 	
 	public void updateBarItemsWithProgress(float progress){
@@ -112,39 +95,21 @@ public class CRefreshView extends RelativeLayout{
 	        float endPadding = 1 - this.internalAnimationFactor - startPadding;
 	        
 	        if (progress == 1 || progress >= 1 - endPadding) {
+	        	barItem.resetMatrix();
 	            barItem.setAlpha(kbarDarkAlpha);
-	        }
-	        else if (progress == 0) {
-	            barItem.setHorizontalRandomness(this.horizontalRandomness, this.dropHeight);	        }
-	        else {
+	        }else if (progress == 0) {
+	            barItem.setHorizontalRandomness(this.horizontalRandomness, this.dropHeight);	        
+	        }else {
 	            float realProgress;
 	            if (progress <= startPadding)
 	                realProgress = 0;
 	            else
 	                realProgress = Math.min(1, (progress - startPadding)/this.internalAnimationFactor);
-	            
-//	            AnimatorSet mAnimatorSet = new AnimatorSet();
-//	    		mAnimatorSet.setDuration(800);
-//	    		
-//	    		mAnimatorSet.playTogether(
-//	    					ObjectAnimator.ofFloat(barItem, "translationY", -barItem.translationX*(1-realProgress), this.dropHeight*(1-realProgress)),
-////	    					ObjectAnimator.ofFloat(barItem, "rotation", 0, 10, 0, 10),
-//	    					ObjectAnimator.ofFloat(barItem, "scaleX", realProgress, realProgress),
-//	    					ObjectAnimator.ofFloat(barItem, "scaleY", realProgress, realProgress)
-//	    				);
-//	    		mAnimatorSet.start();
-	            AnimationSet anim = new AnimationSet(true); 
-	            Animation tAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 1.0f,
-	            		Animation.ABSOLUTE, -barItem.translationX*(1-realProgress), Animation.ABSOLUTE, this.dropHeight*(1-realProgress));
-	    		Animation rAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 
-	    				0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-	    		Animation sAnimation = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f,   
-	    				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-	    		anim.addAnimation(tAnimation);
-	    		anim.addAnimation(rAnimation);
-	    		anim.addAnimation(sAnimation);
-	    		barItem.startAnimation(anim);
-	            barItem.setAlpha(realProgress * kbarDarkAlpha);
+	            barItem.preMatrixTranslate(barItem.translationX*(1-realProgress), -this.dropHeight*(1-realProgress));
+	            barItem.preMatrixScale(1.0f*realProgress, 1.0f*realProgress);
+	            barItem.preMatrixRotate((float)Math.PI*realProgress);
+	            barItem.invalidate();
+	            barItem.setAlpha(realProgress*kbarDarkAlpha);
 	        }
 	    }
 	}
@@ -153,25 +118,32 @@ public class CRefreshView extends RelativeLayout{
 	    if (this.reverseLoadingAnimation) {
 	        int count = (int)this.barItems.size();
 	        for (int i= count-1; i>=0; i--) {
-	            BarItem barItem = this.barItems.get(i);
-	            this.barItemAnimation(barItem, (this.barItems.size()-i-1)*kloadingTimingOffset);
+	        	final BarItem barItem = this.barItems.get(i);
+	            new Handler().postDelayed(new Runnable(){  
+	                public void run() {  
+	                	CRefreshView.this.barItemAnimation(barItem);
+	                }  
+	             }, (this.barItems.size()-i-1)*kloadingTimingOffset);
 	        }
 	    }else {
 	        for (int i=0; i<this.barItems.size(); i++) {
-	            BarItem barItem = this.barItems.get(i);
-	            this.barItemAnimation(barItem, i*kloadingTimingOffset);
+	        	final BarItem barItem = this.barItems.get(i);
+	            new Handler().postDelayed(new Runnable(){  
+	                public void run() {  
+	                	CRefreshView.this.barItemAnimation(barItem);
+	                }  
+	             }, i*kloadingTimingOffset);
 	        }
 	    }
 	}
 
-	private void barItemAnimation(BarItem barItem, float delay){
+	private void barItemAnimation(BarItem barItem){
 	    if (this.state == CRefreshLayoutState.CRefreshLayoutStateRefreshing){
-	        barItem.setAlpha(1f);
+	    	Log.v("CRefreshLayout", "barItemAnimation...");
 	        barItem.clearAnimation();
 	        
-	        Animation alphaA = new AlphaAnimation(barItem.getAlpha() , kbarDarkAlpha);
-	        alphaA.setStartOffset((long)delay);
-	        alphaA.setDuration((long)kloadingIndividualAnimationTiming*1000);
+	        Animation alphaA = new AlphaAnimation(1f, kbarDarkAlpha);
+	        alphaA.setDuration(kloadingIndividualAnimationTiming);
 	        barItem.startAnimation(alphaA);
 	        boolean isLastOne;
 	        if (this.reverseLoadingAnimation)
@@ -194,9 +166,7 @@ public class CRefreshView extends RelativeLayout{
 	}
     
 	public void finishingLoading(){
-//	    this.state = CRefreshLayoutState.CRefreshLayoutStateDisappearing;
-	    
-	    this.state = CRefreshLayoutState.CRefreshLayoutStateIdle;
+	    this.state = CRefreshLayoutState.CRefreshLayoutStateDisappearing;
         this.disappearProgress = 1;
 	    for (BarItem barItem : this.barItems) {
 	        barItem.clearAnimation();
