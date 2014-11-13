@@ -1,34 +1,15 @@
 CRefreshLayout
 ==============
 A stunning android pull refresh layout inspired by <a href="https://github.com/coolbeet/CBStoreHouseRefreshControl">CBStoreHouseRefreshControl</a>.
-How to use:
-==============
-1, in layout
-<com.cloay.crefreshlayout.widget.CRefreshLayout
-        android:id="@+id/crefreshLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ListView android:id="@+id/listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>    
-</com.cloay.crefreshlayout.widget.CRefreshLayout>
-2, And init
-refreshLayout = (CRefreshLayout) findViewById(R.id.crefreshLayout);
-		refreshLayout.setOnRefreshListener(new OnRefreshListener() {
-			
-			@Override
-			public void onRefresh() {
-				  //refresh data;
-				  
-			}
-});
+
+<br><br>
 Thanks
 ==============
-<a href="https://github.com/coolbeet/CBStoreHouseRefreshControl">CBStoreHouseRefreshControl</a>
+<a href="https://github.com/coolbeet/CBStoreHouseRefreshControl">CBStoreHouseRefreshControl</a><br>
 <a href="https://github.com/baoyongzhang/android-PullRefreshLayout">android-PullRefreshLayout</a>
 About me
 ==============
-Email:shangrody@gmail.com
+Email:shangrody@gmail.com<br>
 blog:www.cloay.com
 License
 ==============
