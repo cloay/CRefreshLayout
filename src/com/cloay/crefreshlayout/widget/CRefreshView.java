@@ -2,13 +2,15 @@ package com.cloay.crefreshlayout.widget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.RelativeLayout;
@@ -24,20 +26,21 @@ public class CRefreshView extends RelativeLayout{
 	
     private static final long kloadingIndividualAnimationTiming = 800;
     private static final float kbarDarkAlpha = 0.6f;
-    private static final long kloadingTimingOffset = 250;
+    private static final long kloadingTimingOffset = 300;
     private static final float kdisappearDuration = 0.8f;
     
-    private int dropHeight = 180;
+    private int dropHeight = 160;
     private int lineColor = Color.BLACK;
     private float lineWidth = 6f;
     private float disappearProgress;
     private boolean reverseLoadingAnimation = true;
-    private float internalAnimationFactor = 0.5f;
-    private int horizontalRandomness = 120;
+    private float internalAnimationFactor = 0.6f;
+    private int horizontalRandomness = 150;
     public CRefreshLayoutState state = CRefreshLayoutState.CRefreshLayoutStateIdle;
     
     private List<BarItem> barItems;
 	 
+    private Context mContext;
 	public CRefreshView(Context context) {
 		super(context);
 		init(context);
@@ -55,6 +58,7 @@ public class CRefreshView extends RelativeLayout{
 
 	
 	public void init(Context context){
+		mContext = context;
 		barItems = new ArrayList<BarItem>();
 		
 		List<Point> startPoints = new ArrayList<Point>();
@@ -94,8 +98,8 @@ public class CRefreshView extends RelativeLayout{
 	        float startPadding = (1 - this.internalAnimationFactor) / this.barItems.size() * index;
 	        float endPadding = 1 - this.internalAnimationFactor - startPadding;
 	        
+	        barItem.resetMatrix();
 	        if (progress == 1 || progress >= 1 - endPadding) {
-	        	barItem.resetMatrix();
 	            barItem.setAlpha(kbarDarkAlpha);
 	        }else if (progress == 0) {
 	            barItem.setHorizontalRandomness(this.horizontalRandomness, this.dropHeight);	        
@@ -107,7 +111,7 @@ public class CRefreshView extends RelativeLayout{
 	                realProgress = Math.min(1, (progress - startPadding)/this.internalAnimationFactor);
 	            barItem.preMatrixTranslate(barItem.translationX*(1-realProgress), -this.dropHeight*(1-realProgress));
 	            barItem.preMatrixScale(1.0f*realProgress, 1.0f*realProgress);
-	            barItem.preMatrixRotate((float)Math.PI*realProgress);
+	            barItem.preMatrixRotate(-(float)Math.PI*realProgress);
 	            barItem.invalidate();
 	            barItem.setAlpha(realProgress*kbarDarkAlpha);
 	        }
@@ -139,7 +143,6 @@ public class CRefreshView extends RelativeLayout{
 
 	private void barItemAnimation(BarItem barItem){
 	    if (this.state == CRefreshLayoutState.CRefreshLayoutStateRefreshing){
-	    	Log.v("CRefreshLayout", "barItemAnimation...");
 	        barItem.clearAnimation();
 	        
 	        Animation alphaA = new AlphaAnimation(1f, kbarDarkAlpha);
@@ -159,8 +162,7 @@ public class CRefreshView extends RelativeLayout{
 
 	public void updateDisappearAnimation(){
 	    if (this.disappearProgress >= 0 && this.disappearProgress <= 1) {
-	        this.disappearProgress -= 1/60.f/kdisappearDuration;
-	        //60.f means this method get called 60 times per second
+	        this.disappearProgress -= 1/30.f/kdisappearDuration;
 	        this.updateBarItemsWithProgress(this.disappearProgress);
 	    }
 	}
@@ -172,7 +174,30 @@ public class CRefreshView extends RelativeLayout{
 	        barItem.clearAnimation();
 	        barItem.setAlpha(kbarDarkAlpha);
 	    }
-	    updateDisappearAnimation();
+	    
+	    updateDisappearProgress();
+	}
+	
+	public void updateDisappearProgress(){
+		final Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				if(disappearProgress <= 0){
+					timer.cancel();
+					timer.purge();
+				}
+				synchronized (this) {//must make sure thread is synchronize
+					((Activity) mContext).runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							updateDisappearAnimation();
+						}
+					});
+				}
+			}
+		}, 0, 1000/30);
 	}
 	
     public enum CRefreshLayoutState{
@@ -181,4 +206,7 @@ public class CRefreshView extends RelativeLayout{
     	CRefreshLayoutStateDisappearing
     }
     
+    public void setDisappearProgress(float disappearProgress){
+    	this.disappearProgress = disappearProgress;
+    }
 }

@@ -8,6 +8,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -18,9 +19,9 @@ import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 
-public class CRefreshLayout extends ViewGroup {
+public class CRefreshLayout extends ViewGroup{
 	private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
-    private static final int DRAG_MAX_DISTANCE = 180;
+    private static final int DRAG_MAX_DISTANCE = 84;
     private static final int INVALID_POINTER = -1;
     private static final float DRAG_RATE = .8f;
 
@@ -61,11 +62,11 @@ public class CRefreshLayout extends ViewGroup {
 	public void init(Context context){
         mDecelerateInterpolator = new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        mMediumAnimationDuration = 1200;
-        mSpinnerFinalOffset = mTotalDragDistance = DRAG_MAX_DISTANCE;
+        mMediumAnimationDuration = getResources().getInteger(
+                android.R.integer.config_mediumAnimTime);;
+        mSpinnerFinalOffset = mTotalDragDistance = dp2px(DRAG_MAX_DISTANCE);
 
         mRefreshView = new CRefreshView(context);
-        mRefreshView.setVisibility(View.GONE);
         addView(mRefreshView);
         setWillNotDraw(false);
 	}
@@ -176,7 +177,7 @@ public class CRefreshLayout extends ViewGroup {
                 if (originalDragPercent < 0) {
                     return false;
                 }
-                float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
+                float dragPercent = Math.min(1f, Math.max(0f, Math.abs(originalDragPercent)));
 //                float adjustedPercent = (float) Math.max(dragPercent - .4, 0) * 5 / 3;
 //                    float adjustedPercent = dragPercent;
                 float extraOS = Math.abs(scrollTop) - mTotalDragDistance;
@@ -189,9 +190,6 @@ public class CRefreshLayout extends ViewGroup {
                 int targetY = (int) ((slingshotDist * dragPercent) + extraMove);
                 if (scrollTop < mTotalDragDistance) {
                 	if(mRefreshView.state == CRefreshLayoutState.CRefreshLayoutStateIdle){
-                		if (mRefreshView.getVisibility() != View.VISIBLE) {
-                    		mRefreshView.setVisibility(View.VISIBLE);
-                    	}
                 		mRefreshView.updateBarItemsWithProgress(dragPercent);
                 	}
                 }
@@ -219,6 +217,15 @@ public class CRefreshLayout extends ViewGroup {
                     setRefreshing(true, true);
                 } else {
                     mRefreshing = false;
+                    final float yDiff = y - mInitialMotionY;
+                    final float scrollTop = yDiff * DRAG_RATE;
+                    float originalDragPercent = scrollTop / mTotalDragDistance;
+                    if (originalDragPercent < 0) {
+                        return false;
+                    }
+                    float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
+                    mRefreshView.setDisappearProgress(dragPercent);
+                    mRefreshView.updateDisappearProgress();
                     animateOffsetToStartPosition();
                 }
                 mActivePointerId = INVALID_POINTER;
@@ -231,8 +238,6 @@ public class CRefreshLayout extends ViewGroup {
 
 
     private void animateOffsetToStartPosition() {
-    	mRefreshView.state = CRefreshLayoutState.CRefreshLayoutStateIdle;
-        mRefreshView.setVisibility(View.GONE);
         mFrom = mCurrentOffsetTop;
         mAnimateToStartPosition.reset();
         mAnimateToStartPosition.setDuration(mMediumAnimationDuration);
@@ -291,7 +296,6 @@ public class CRefreshLayout extends ViewGroup {
                 animateOffsetToCorrectPosition();
             } else {
             	mRefreshView.finishingLoading();
-            	mRefreshView.updateDisappearAnimation();
                 animateOffsetToStartPosition();
             }
         }
@@ -300,7 +304,8 @@ public class CRefreshLayout extends ViewGroup {
     private Animation.AnimationListener mRefreshListener = new Animation.AnimationListener() {
         @Override
         public void onAnimationStart(Animation animation) {
-//            mRefreshView.setVisibility(View.VISIBLE);
+        	if(mRefreshing)
+        		mRefreshView.startLoadingAnimation();
         }
 
         @Override
@@ -310,7 +315,6 @@ public class CRefreshLayout extends ViewGroup {
         @Override
         public void onAnimationEnd(Animation animation) {
             if (mRefreshing) {
-            	mRefreshView.startLoadingAnimation();
                 if (mNotify) {
                     if (mListener != null) {
                         mListener.onRefresh();
@@ -326,6 +330,7 @@ public class CRefreshLayout extends ViewGroup {
     private Animation.AnimationListener mToStartListener = new Animation.AnimationListener() {
         @Override
         public void onAnimationStart(Animation animation) {
+        	
         }
 
         @Override
@@ -334,6 +339,7 @@ public class CRefreshLayout extends ViewGroup {
 
         @Override
         public void onAnimationEnd(Animation animation) {
+        	mRefreshView.state = CRefreshLayoutState.CRefreshLayoutStateIdle;
             mCurrentOffsetTop = mTarget.getTop();
         }
     };
@@ -357,7 +363,7 @@ public class CRefreshLayout extends ViewGroup {
 
     private void setTargetOffsetTop(int offset, boolean requiresUpdate) {
         mRefreshView.bringToFront();
-        mRefreshView.offsetTopAndBottom(offset/2);
+        mRefreshView.offsetTopAndBottom(offset/6);
         mTarget.offsetTopAndBottom(offset);
         mCurrentOffsetTop = mTarget.getTop();
         if (requiresUpdate && android.os.Build.VERSION.SDK_INT < 11) {
@@ -397,11 +403,9 @@ public class CRefreshLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-
         ensureTarget();
         if (mTarget == null)
             return;
-
         int height = getMeasuredHeight();
         int width = getMeasuredWidth();
         int left = getPaddingLeft();
@@ -421,5 +425,9 @@ public class CRefreshLayout extends ViewGroup {
 
     public static interface OnRefreshListener {
         public void onRefresh();
+    }
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getContext().getResources().getDisplayMetrics());
     }
 }

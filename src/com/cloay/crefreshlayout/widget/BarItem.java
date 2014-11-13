@@ -1,5 +1,7 @@
 package com.cloay.crefreshlayout.widget;
 
+import java.util.Random;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -69,7 +71,7 @@ public class BarItem extends View {
 	}
 	
 	public void setHorizontalRandomness(int horizontalRandomness, int dropHeight){
-		int randomNum = -horizontalRandomness + (int)(Math.random()*horizontalRandomness*2);
+		int randomNum = -horizontalRandomness + (new Random()).nextInt(horizontalRandomness*2);
 		this.translationX = randomNum;
 		
 		Animation tAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 1.0f,
