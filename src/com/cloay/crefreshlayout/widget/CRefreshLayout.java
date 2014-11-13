@@ -21,9 +21,9 @@ import android.widget.AbsListView;
 
 public class CRefreshLayout extends ViewGroup{
 	private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
-    private static final int DRAG_MAX_DISTANCE = 84;
+    private static final int DRAG_MAX_DISTANCE = 64;
     private static final int INVALID_POINTER = -1;
-    private static final float DRAG_RATE = .8f;
+    private static final float DRAG_RATE = .5f;
 
     public static final int MODE_TOP = 0;
     public static final int MODE_BOTTOM = 1;
@@ -363,7 +363,7 @@ public class CRefreshLayout extends ViewGroup{
 
     private void setTargetOffsetTop(int offset, boolean requiresUpdate) {
         mRefreshView.bringToFront();
-        mRefreshView.offsetTopAndBottom(offset/6);
+        mRefreshView.offsetTopAndBottom(offset/DRAG_MAX_DISTANCE);
         mTarget.offsetTopAndBottom(offset);
         mCurrentOffsetTop = mTarget.getTop();
         if (requiresUpdate && android.os.Build.VERSION.SDK_INT < 11) {
