@@ -189,10 +189,8 @@ public class CRefreshLayout extends ViewGroup{
                         (tensionSlingshotPercent / 4), 2)) * 2f;
                 float extraMove = (slingshotDist) * tensionPercent * 2;
                 int targetY = (int) ((slingshotDist * dragPercent) + extraMove);
-                if (scrollTop < mTotalDragDistance) {
-                	if(mRefreshView.state == CRefreshLayoutState.CRefreshLayoutStateIdle){
-                		mRefreshView.updateBarItemsWithProgress(dragPercent);
-                	}
+                if(mRefreshView.state == CRefreshLayoutState.CRefreshLayoutStateIdle){
+                	mRefreshView.updateBarItemsWithProgress(dragPercent);
                 }
                 setTargetOffsetTop(targetY - mCurrentOffsetTop, true);
                 break;

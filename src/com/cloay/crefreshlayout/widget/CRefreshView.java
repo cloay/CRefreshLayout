@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.RelativeLayout;
@@ -137,6 +138,7 @@ public class CRefreshView extends RelativeLayout{
 	}
 	
 	public void updateBarItemsWithProgress(float progress){
+		Log.v("CRefreshLayout", "updateBarItemsWithProgress dragPercent" + progress);
 	    for (BarItem barItem : this.barItems) {
 	        int index = this.barItems.indexOf(barItem);
 	        float startPadding = (1 - this.internalAnimationFactor) / this.barItems.size() * index;
