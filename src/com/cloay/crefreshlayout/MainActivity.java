@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
 					@Override
 					protected Void doInBackground(Void... params) {
 						try {
-							Thread.sleep(3*1000); //sleep 3 seconds
+							Thread.sleep(6*1000); //sleep 3 seconds
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}

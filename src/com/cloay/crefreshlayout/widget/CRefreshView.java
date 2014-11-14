@@ -26,7 +26,7 @@ import android.widget.RelativeLayout;
 public class CRefreshView extends RelativeLayout{
 	
     private static final long kloadingIndividualAnimationTiming = 800;
-    private static final float kbarDarkAlpha = 0.6f;
+    private static final float kbarDarkAlpha = 0.55f;
     private static final long kloadingTimingOffset = 300;
     private static final float kdisappearDuration = 0.8f;
     
@@ -34,7 +34,7 @@ public class CRefreshView extends RelativeLayout{
     private int lineColor = Color.BLACK;
     private float lineWidth = 3f;
     private float disappearProgress;
-    private boolean reverseLoadingAnimation = true;
+    private boolean reverseLoadingAnimation = false;
     private float internalAnimationFactor = 0.6f;
     private int horizontalRandomness = 150;
     public CRefreshLayoutState state = CRefreshLayoutState.CRefreshLayoutStateIdle;
