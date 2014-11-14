@@ -19,6 +19,13 @@ import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 
+/**
+ * 
+ * @ClassName: CRefreshLayout 
+ * @author cloay Email:shangrody@gmail.com 
+ * @date 2014-11-14 обнГ6:05:44 
+ *
+ */
 public class CRefreshLayout extends ViewGroup{
 	private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
     private static final int DRAG_MAX_DISTANCE = 64;
