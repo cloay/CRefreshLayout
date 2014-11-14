@@ -29,9 +29,9 @@ public class CRefreshView extends RelativeLayout{
     private static final long kloadingTimingOffset = 300;
     private static final float kdisappearDuration = 0.8f;
     
-    private int dropHeight = 160;
+    private int dropHeight = 64;
     private int lineColor = Color.BLACK;
-    private float lineWidth = 6f;
+    private float lineWidth = 3f;
     private float disappearProgress;
     private boolean reverseLoadingAnimation = true;
     private float internalAnimationFactor = 0.6f;
@@ -39,7 +39,6 @@ public class CRefreshView extends RelativeLayout{
     public CRefreshLayoutState state = CRefreshLayoutState.CRefreshLayoutStateIdle;
     
     private List<BarItem> barItems;
-	 
     private Context mContext;
 	public CRefreshView(Context context) {
 		super(context);
@@ -62,18 +61,63 @@ public class CRefreshView extends RelativeLayout{
 		barItems = new ArrayList<BarItem>();
 		
 		List<Point> startPoints = new ArrayList<Point>();
-		startPoints.add(new Point(335, 50));
-		startPoints.add(new Point(385, 50));
-		startPoints.add(new Point(335, 50));
-		startPoints.add(new Point(335, 100));
+		//Мг
+		startPoints.add(new Point(240, 85));
+		startPoints.add(new Point(255, 70));
+		startPoints.add(new Point(270, 85));
+		startPoints.add(new Point(265, 108));
+		startPoints.add(new Point(275, 85));
+		startPoints.add(new Point(275, 85));
+		startPoints.add(new Point(275, 112));
+		startPoints.add(new Point(302, 85));
+		
+		//ди
+		startPoints.add(new Point(320, 75));
+		startPoints.add(new Point(313, 85));
+		startPoints.add(new Point(330, 68));
+		startPoints.add(new Point(315, 92));
+		startPoints.add(new Point(330, 85));
+		startPoints.add(new Point(315, 105));
+		startPoints.add(new Point(330, 95));
+		startPoints.add(new Point(315, 115));
+		startPoints.add(new Point(345, 70));
+		startPoints.add(new Point(357, 72));
+		startPoints.add(new Point(363, 108));
+		//жа
+		startPoints.add(new Point(375, 85));
+		startPoints.add(new Point(375, 85));
+		startPoints.add(new Point(425, 85));
+		startPoints.add(new Point(380, 100));
+		startPoints.add(new Point(400, 68));
+		
 		
 		List<Point> endPoints = new ArrayList<Point>();
-		endPoints.add(new Point(385, 50));
-		endPoints.add(new Point(385, 100));
-		endPoints.add(new Point(335, 100));
-		endPoints.add(new Point(385, 100));
-		
-		
+		endPoints.add(new Point(270, 85));
+		endPoints.add(new Point(250, 115));
+		endPoints.add(new Point(270, 115));
+		endPoints.add(new Point(270, 115));
+		endPoints.add(new Point(302, 85));
+		endPoints.add(new Point(275, 112));
+		endPoints.add(new Point(302, 112));
+		endPoints.add(new Point(302, 112));
+		//ди
+		endPoints.add(new Point(340, 75));
+		endPoints.add(new Point(360, 85));
+		endPoints.add(new Point(330, 85));
+		endPoints.add(new Point(340, 92));
+		endPoints.add(new Point(315, 105));
+		endPoints.add(new Point(345, 103));
+		endPoints.add(new Point(330, 125));
+		endPoints.add(new Point(345, 113));
+		endPoints.add(new Point(360, 125));
+		endPoints.add(new Point(363, 80));
+		endPoints.add(new Point(345, 122));
+		//жа
+		endPoints.add(new Point(380, 100));
+		endPoints.add(new Point(425, 85));
+		endPoints.add(new Point(420, 100));
+		endPoints.add(new Point(420, 100));
+		endPoints.add(new Point(400, 125));
 		
 		for(int i = 0; i < startPoints.size(); i++){
 			Point startP = startPoints.get(i);

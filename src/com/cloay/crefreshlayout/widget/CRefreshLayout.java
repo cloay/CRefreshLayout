@@ -180,6 +180,7 @@ public class CRefreshLayout extends ViewGroup{
                 float dragPercent = Math.min(1f, Math.max(0f, Math.abs(originalDragPercent)));
 //                float adjustedPercent = (float) Math.max(dragPercent - .4, 0) * 5 / 3;
 //                    float adjustedPercent = dragPercent;
+                Log.v("CRefreshLayout", "dragPercent" + dragPercent);
                 float extraOS = Math.abs(scrollTop) - mTotalDragDistance;
                 float slingshotDist = mSpinnerFinalOffset;
                 float tensionSlingshotPercent = Math.max(0,
@@ -226,7 +227,7 @@ public class CRefreshLayout extends ViewGroup{
                     float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
                     mRefreshView.setDisappearProgress(dragPercent);
                     mRefreshView.updateDisappearProgress();
-                    animateOffsetToStartPosition();
+                    animateOffsetToStartPosition((long)(1000*dragPercent));
                 }
                 mActivePointerId = INVALID_POINTER;
                 return false;
@@ -237,12 +238,13 @@ public class CRefreshLayout extends ViewGroup{
     }
 
 
-    private void animateOffsetToStartPosition() {
+    private void animateOffsetToStartPosition(long startOffset) {
         mFrom = mCurrentOffsetTop;
         mAnimateToStartPosition.reset();
         mAnimateToStartPosition.setDuration(mMediumAnimationDuration);
         mAnimateToStartPosition.setInterpolator(mDecelerateInterpolator);
         mAnimateToStartPosition.setAnimationListener(mToStartListener);
+        mAnimateToStartPosition.setStartOffset(startOffset);
         mRefreshView.clearAnimation();
         mRefreshView.startAnimation(mAnimateToStartPosition);
     }
@@ -296,7 +298,7 @@ public class CRefreshLayout extends ViewGroup{
                 animateOffsetToCorrectPosition();
             } else {
             	mRefreshView.finishingLoading();
-                animateOffsetToStartPosition();
+            	animateOffsetToStartPosition(1000);
             }
         }
     }
@@ -321,7 +323,7 @@ public class CRefreshLayout extends ViewGroup{
                     }
                 }
             } else {
-                animateOffsetToStartPosition();
+                animateOffsetToStartPosition(0);
             }
             mCurrentOffsetTop = mTarget.getTop();
         }
@@ -416,7 +418,6 @@ public class CRefreshLayout extends ViewGroup{
         mTarget.layout(left, top + mCurrentOffsetTop, left + width - right, top + height - bottom + mCurrentOffsetTop);
 //        mRefreshView.layout(width / 2 - mRefreshViewWidth / 2, -mRefreshViewHeight + mCurrentOffsetTop, width / 2 + mRefreshViewHeight / 2, mCurrentOffsetTop);
         mRefreshView.layout(left, top, left + width - right, top + height - bottom);
-        Log.v("CRefreshLayout", "left=" + left + " width=" + width + " height=" + height);
     }
 
     public void setOnRefreshListener(OnRefreshListener listener) {
@@ -430,4 +431,5 @@ public class CRefreshLayout extends ViewGroup{
     private int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getContext().getResources().getDisplayMetrics());
     }
+	
 }
