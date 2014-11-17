@@ -4,6 +4,7 @@ import com.cloay.crefreshlayout.widget.CRefreshView.CRefreshLayoutState;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -28,9 +29,9 @@ import android.widget.AbsListView;
  */
 public class CRefreshLayout extends ViewGroup{
 	private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
-    private static final int DRAG_MAX_DISTANCE = 64;
+    private static final int DRAG_MAX_DISTANCE = 90;
     private static final int INVALID_POINTER = -1;
-    private static final float DRAG_RATE = .5f;
+    private static final float DRAG_RATE = .6f;
 
     public static final int MODE_TOP = 0;
     public static final int MODE_BOTTOM = 1;
@@ -67,6 +68,7 @@ public class CRefreshLayout extends ViewGroup{
 	
 	
 	public void init(Context context){
+		setBackgroundColor(Color.parseColor("#c8000000"));
         mDecelerateInterpolator = new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         mMediumAnimationDuration = getResources().getInteger(

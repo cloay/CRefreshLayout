@@ -26,12 +26,12 @@ import android.widget.RelativeLayout;
 public class CRefreshView extends RelativeLayout{
 	
     private static final long kloadingIndividualAnimationTiming = 800;
-    private static final float kbarDarkAlpha = 0.55f;
-    private static final long kloadingTimingOffset = 300;
+    private static final float kbarDarkAlpha = 0.4f;
+    private static final long kloadingTimingOffset = 250;
     private static final float kdisappearDuration = 0.8f;
     
-    private int dropHeight = 64;
-    private int lineColor = Color.BLACK;
+    private int dropHeight = 100;
+    private int lineColor = Color.WHITE;
     private float lineWidth = 3f;
     private float disappearProgress;
     private boolean reverseLoadingAnimation = false;
@@ -59,66 +59,67 @@ public class CRefreshView extends RelativeLayout{
 	
 	public void init(Context context){
 		mContext = context;
+		
 		barItems = new ArrayList<BarItem>();
 		
 		List<Point> startPoints = new ArrayList<Point>();
 		//Мг
-		startPoints.add(new Point(240, 85));
-		startPoints.add(new Point(255, 70));
-		startPoints.add(new Point(270, 85));
-		startPoints.add(new Point(265, 108));
-		startPoints.add(new Point(275, 85));
-		startPoints.add(new Point(275, 85));
-		startPoints.add(new Point(275, 112));
-		startPoints.add(new Point(302, 85));
+		startPoints.add(new Point(240, 80));
+		startPoints.add(new Point(270, 80));
+		startPoints.add(new Point(265, 103));
+		startPoints.add(new Point(255, 65));
+		startPoints.add(new Point(275, 80));
+		startPoints.add(new Point(275, 80));
+		startPoints.add(new Point(302, 80));
+		startPoints.add(new Point(275, 107));
 		
 		//ди
-		startPoints.add(new Point(320, 75));
-		startPoints.add(new Point(313, 85));
-		startPoints.add(new Point(330, 68));
-		startPoints.add(new Point(315, 92));
-		startPoints.add(new Point(330, 85));
-		startPoints.add(new Point(315, 105));
-		startPoints.add(new Point(330, 95));
-		startPoints.add(new Point(315, 115));
-		startPoints.add(new Point(345, 70));
-		startPoints.add(new Point(357, 72));
-		startPoints.add(new Point(363, 108));
+		startPoints.add(new Point(320, 70));
+		startPoints.add(new Point(313, 80));
+		startPoints.add(new Point(330, 63));
+		startPoints.add(new Point(315, 87));
+		startPoints.add(new Point(330, 80));
+		startPoints.add(new Point(315, 100));
+		startPoints.add(new Point(330, 90));
+		startPoints.add(new Point(315, 110));
+		startPoints.add(new Point(345, 65));
+		startPoints.add(new Point(357, 67));
+		startPoints.add(new Point(363, 103));
 		//жа
-		startPoints.add(new Point(375, 85));
-		startPoints.add(new Point(375, 85));
-		startPoints.add(new Point(425, 85));
-		startPoints.add(new Point(380, 100));
-		startPoints.add(new Point(400, 68));
+		startPoints.add(new Point(375, 80));
+		startPoints.add(new Point(375, 80));
+		startPoints.add(new Point(425, 80));
+		startPoints.add(new Point(380, 95));
+		startPoints.add(new Point(400, 63));
 		
 		
 		List<Point> endPoints = new ArrayList<Point>();
-		endPoints.add(new Point(270, 85));
-		endPoints.add(new Point(250, 115));
-		endPoints.add(new Point(270, 115));
-		endPoints.add(new Point(270, 115));
-		endPoints.add(new Point(302, 85));
-		endPoints.add(new Point(275, 112));
-		endPoints.add(new Point(302, 112));
-		endPoints.add(new Point(302, 112));
+		endPoints.add(new Point(270, 80));
+		endPoints.add(new Point(270, 110));
+		endPoints.add(new Point(270, 110));
+		endPoints.add(new Point(250, 110));
+		endPoints.add(new Point(275, 107));
+		endPoints.add(new Point(302, 80));
+		endPoints.add(new Point(302, 107));
+		endPoints.add(new Point(302, 107));
 		//ди
-		endPoints.add(new Point(340, 75));
-		endPoints.add(new Point(360, 85));
-		endPoints.add(new Point(330, 85));
-		endPoints.add(new Point(340, 92));
-		endPoints.add(new Point(315, 105));
-		endPoints.add(new Point(345, 103));
-		endPoints.add(new Point(330, 125));
-		endPoints.add(new Point(345, 113));
-		endPoints.add(new Point(360, 125));
-		endPoints.add(new Point(363, 80));
-		endPoints.add(new Point(345, 122));
+		endPoints.add(new Point(340, 70));
+		endPoints.add(new Point(360, 80));
+		endPoints.add(new Point(330, 80));
+		endPoints.add(new Point(340, 87));
+		endPoints.add(new Point(315, 100));
+		endPoints.add(new Point(345, 98));
+		endPoints.add(new Point(330, 120));
+		endPoints.add(new Point(345, 108));
+		endPoints.add(new Point(360, 120));
+		endPoints.add(new Point(363, 75));
+		endPoints.add(new Point(345, 117));
 		//жа
-		endPoints.add(new Point(380, 100));
-		endPoints.add(new Point(425, 85));
-		endPoints.add(new Point(420, 100));
-		endPoints.add(new Point(420, 100));
-		endPoints.add(new Point(400, 125));
+		endPoints.add(new Point(380, 95));
+		endPoints.add(new Point(425, 80));
+		endPoints.add(new Point(420, 95));
+		endPoints.add(new Point(420, 95));
+		endPoints.add(new Point(400, 120));
 		
 		for(int i = 0; i < startPoints.size(); i++){
 			Point startP = startPoints.get(i);
@@ -189,10 +190,12 @@ public class CRefreshView extends RelativeLayout{
 
 	private void barItemAnimation(BarItem barItem){
 	    if (this.state == CRefreshLayoutState.CRefreshLayoutStateRefreshing){
+	    	barItem.setAlpha(1f);
 	        barItem.clearAnimation();
 	        
 	        Animation alphaA = new AlphaAnimation(1f, kbarDarkAlpha);
 	        alphaA.setDuration(kloadingIndividualAnimationTiming);
+	        alphaA.setFillAfter(true);
 	        barItem.startAnimation(alphaA);
 	        boolean isLastOne;
 	        if (this.reverseLoadingAnimation)
