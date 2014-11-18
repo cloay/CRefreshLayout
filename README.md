@@ -1,7 +1,8 @@
 CRefreshLayout
 ==============
 A stunning android pull refresh layout inspired by <a href="https://github.com/coolbeet/CBStoreHouseRefreshControl">CBStoreHouseRefreshControl</a>.
-
+<br>You can define the refresh view by yourself, like this one at the following:<br>
+<img src="http://crefreshlayout.qiniudn.com/CRefreshLayout.gif" />
 <br><br>
 Thanks
 ==============
