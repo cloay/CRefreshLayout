@@ -25,9 +25,9 @@ import android.widget.RelativeLayout;
  */
 public class CRefreshView extends RelativeLayout{
 	
-    private static final long kloadingIndividualAnimationTiming = 800;
+    private static final long kloadingIndividualAnimationTiming = 1200;
     private static final float kbarDarkAlpha = 0.4f;
-    private static final long kloadingTimingOffset = 250;
+    private static final long kloadingTimingOffset = 100;
     private static final float kdisappearDuration = 0.8f;
     
     private int dropHeight = 100;
@@ -91,7 +91,6 @@ public class CRefreshView extends RelativeLayout{
 		startPoints.add(new Point(425, 80));
 		startPoints.add(new Point(380, 95));
 		startPoints.add(new Point(400, 63));
-		
 		
 		List<Point> endPoints = new ArrayList<Point>();
 		endPoints.add(new Point(270, 80));
